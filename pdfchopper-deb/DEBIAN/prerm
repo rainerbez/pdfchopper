@@ -1,0 +1,18 @@
+#!/bin/bash
+# prerm script for PDFChopper
+# Remove main executable before package removal
+if [ -f /usr/local/bin/pdfchopper ]; then
+    rm -f /usr/local/bin/pdfchopper
+fi
+if [ -f /usr/local/bin/pdfchopper.py ]; then
+    rm -f /usr/local/bin/pdfchopper.py
+fi
+if [ -f /usr/share/icons/hicolor/256x256/apps/pdfchopper.png ]; then
+    rm -f /usr/share/icons/hicolor/256x256/apps/pdfchopper.png
+fi
+if [ -f /usr/share/icons/hicolor/scalable/apps/pdfchopper.svg ]; then
+    rm -f /usr/share/icons/hicolor/scalable/apps/pdfchopper.svg
+fi
+if [ -f /usr/share/applications/pdfchopper.desktop ]; then
+    rm -f /usr/share/applications/pdfchopper.desktop
+fi

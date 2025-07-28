@@ -1,0 +1,8 @@
+Package: pdfchopper
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3, qpdf
+Maintainer: Rainer Bezzina <info@panzmalty.pl>
+Description: PDF Chopper - Easily Split and export pages from PDF files.

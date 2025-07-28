@@ -15,12 +15,25 @@ It is built with Python's Tkinter and tkinterdnd2 for GUI and drag-and-drop supp
 - Export to custom folders, with quick access to default and parent folders
 - Configuration library for reusing previously used export setups
 
-## Requirements
+## Requirements (On Linux)
 
 - Python 3
 - tkinter (`sudo apt-get install python3-tk`)
 - tkinterdnd2 (`pip install tkinterdnd2`)
 - qpdf (`sudo apt install qpdf`)
+
+## Installation
+
+To install PDFChopper on a Debian-based system, you can create a Debian package. Here are the steps:
+
+1. Build the DEB file:
+   `dpkg-deb --build pdfchopper`
+   You can also use the link [pdfchopper-deb](PDFChopper-deb) to download the pre-built DEB package.
+2. Install the package:
+   `dpkg -i pdfchopper.deb`
+3. Run PDFChopper from the application menu or by executing `pdfchopper` in the terminal.
+4. Remove the package with:
+   `dpkg -r pdfchopper`
 
 ## Usage
 

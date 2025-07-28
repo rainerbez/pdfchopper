@@ -1,0 +1,11 @@
+#!/bin/bash
+# postrm script for PDFChopper
+
+# Optionally remove config files
+CONFIG_DIR="$HOME/.pdfchopper"
+if [ -d "$CONFIG_DIR" ]; then
+    echo "Removing PDFChopper config directory: $CONFIG_DIR"
+    rm -rf "$CONFIG_DIR"
+else
+    echo "Manually delete PDFChopper config directory in ~/.pdfchopper if it exists."
+fi

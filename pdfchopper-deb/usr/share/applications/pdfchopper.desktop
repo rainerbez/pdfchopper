@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=PDFChopper
+Comment=Split and export pages from PDF files
+Exec=/usr/local/bin/pdfchopper
+Icon=pdfchopper
+Terminal=false
+Type=Application
+Categories=Utility;Office;
