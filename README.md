@@ -1,10 +1,12 @@
 # PDFChopper
 
+![PDFChopper Icon](pdfchopper.png)
+
 PDFChopper is a graphical application designed to split and export pages from PDF files. Its primary purpose is to help you import large PDF documents and divide them into smaller PDFs based on specified page ranges. The application allows you to select specific pages, repeat them at the start or end of the exported files, and save these configurations for future use. Using + and - you can easily modify the page ranges for export when the input/source PDF file is modified.
 
 It is built with Python's Tkinter and tkinterdnd2 for GUI and drag-and-drop support, and uses the `qpdf` utility for PDF manipulation.
 
-![PDFChopper Screenshot](pdfchopper.png)
+![PDFChopper Screenshot](screenshot.png)
 
 ## Features
 
@@ -28,7 +30,7 @@ To install PDFChopper on a Debian-based system, you can create a Debian package.
 
 1. Build the DEB file:
    `dpkg-deb --build pdfchopper`
-   You can also use the link [pdfchopper-deb](PDFChopper-deb) to download the pre-built DEB package.
+   You can also use the link [pdfchopper.deb](pdfchopper.deb) to download the pre-built DEB package.
 2. Install the package:
    `dpkg -i pdfchopper.deb`
 3. Run PDFChopper from the application menu or by executing `pdfchopper` in the terminal.
