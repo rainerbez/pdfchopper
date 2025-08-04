@@ -81,6 +81,10 @@ class PDFChopper(TkinterDnD.Tk):
         self.export_folder_label.drop_target_register(DND_FILES)
         self.export_folder_label.dnd_bind('<<Drop>>', self.on_drop_folder)
 
+        self.export_folder_open_button = tk.Button(file_frame, text="Open", command=self.open_export_folder)
+        self.export_folder_open_button.pack(side="left", padx=10)
+
+
         # Input fields
         self.input_frame = tk.Frame(self)
         self.input_frame.pack(pady=10)
@@ -248,6 +252,22 @@ class PDFChopper(TkinterDnD.Tk):
         else:
             messagebox.showerror("Invalid file", "Please drop a PDF file.")
 
+    def open_export_folder(self):
+        """
+        Open the export folder in the file explorer.
+        """
+        export_folder = self.export_folder_label.cget("text")
+        if os.path.exists(export_folder):
+            if os.name == 'nt':  # Windows
+                os.startfile(export_folder)
+            elif os.name == 'posix':  # macOS or Linux
+                try:
+                    os.system(f'open "{export_folder}"' if os.name == 'posix' else f'xdg-open "{export_folder}"')
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to open folder:\n{e}")
+        else:
+            messagebox.showerror("Error", f"Export folder does not exist: {export_folder}")
+
 
     def save_as_default_export_folder(self):
         self.default_export_folder = self.export_folder_label.cget("text")
@@ -279,7 +299,7 @@ class PDFChopper(TkinterDnD.Tk):
         elif os.path.exists(os.path.join(PDFCHOPPER_CONFIG_LIBRARY_FOLDER, base + ".json")):
             self._load_data_from_file(os.path.join(PDFCHOPPER_CONFIG_LIBRARY_FOLDER, base + ".json"))
         else:
-            self.show_status(f"No Config Data File was found for {base}.json", fg="red")
+            self.show_status(f"A new config data file will be created: {base}.json", fg="green")
             base_name = os.path.splitext(os.path.basename(self.loaded_file_path))[0]
             # Get the part before the first underscore, or the whole name if no underscore
             first_part = base_name.split('_')[0]
@@ -429,7 +449,7 @@ class PDFChopper(TkinterDnD.Tk):
             else:
                 base_name = self.output_base_name.get().strip()
                 outname = self.row_data[i-1]['outname'].get().strip()
-                self.show_status(f"Exported all files. Finished with row {i}, {base_name}{outname}.pdf",fg="green")
+                self.show_status(f"Exported all files. Finished with row {i}, {base_name}{outname}.pdf",fg="green", clickPath="exportall")
                 return
 
 
@@ -478,7 +498,7 @@ class PDFChopper(TkinterDnD.Tk):
         # print(f"Pages to export: {pages}")
         # print(f"Output file: {output_file_with_path}")  
         PDFChopper.export_with_qpdf(input_file_with_path, pages, output_file_with_path)
-        self.show_status(f"Exported Pages {result} to {export_folder}/{base_name}{outname}", fg="green")
+        self.show_status(f"Exported Pages {result} to {export_folder}/{base_name}{outname}", fg="green", clickPath=output_file_with_path)
 
 
     def change_all_by(self,row,value):
@@ -500,10 +520,19 @@ class PDFChopper(TkinterDnD.Tk):
             row=row+1;
 
 
-    def show_status(self, message, fg="black"):
+    def show_status(self, message, fg="black",clickPath=""):
         """
         Show a status message in the status label.
         """
+        if clickPath=="exportall":
+            self.status_label.bind("<Button-1>", lambda e: self.open_export_folder())
+            self.status_label.config(cursor="hand2")
+        elif clickPath:
+            self.status_label.bind("<Button-1>", lambda e: os.startfile(clickPath) if os.name == 'nt' else os.system(f'xdg-open "{clickPath}"'))
+            self.status_label.config(cursor="hand2")
+        else:
+            self.status_label.unbind("<Button-1>")
+            self.status_label.config(cursor="")
         self.status_label.config(text=message, fg=fg)
 
 
