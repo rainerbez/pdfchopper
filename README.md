@@ -29,10 +29,10 @@ It is built with Python's Tkinter and tkinterdnd2 for GUI and drag-and-drop supp
 To install PDFChopper on a Debian-based system, you can create a Debian package. Here are the steps:
 
 1. Build the DEB file:
-   `dpkg-deb --build pdfchopper`
-   You can also use the link [pdfchopper.deb](pdfchopper.deb) to download the pre-built DEB package.
+   `dpkg-deb --build pdfchopper-deb`
+   You can also use the link [pdfchopper-deb.deb](pdfchopper-deb.deb) to download the pre-built DEB package.
 2. Install the package:
-   `dpkg -i pdfchopper.deb`
+   `dpkg -i pdfchopper-deb.deb`
 3. Run PDFChopper from the application menu or by executing `pdfchopper` in the terminal.
 4. Remove the package with:
    `dpkg -r pdfchopper`
