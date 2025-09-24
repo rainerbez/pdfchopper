@@ -30,6 +30,8 @@ class PDFChopper(TkinterDnD.Tk):
     loaded_file_path = ""
     default_config_file_path = ""
     use_library = True
+    open_after_export = True
+    over_write_without_warning = False
 
 
     def __init__(self):
@@ -84,6 +86,11 @@ class PDFChopper(TkinterDnD.Tk):
         self.export_folder_open_button = tk.Button(file_frame, text="Open", command=self.open_export_folder)
         self.export_folder_open_button.pack(side="left", padx=10)
 
+        self.open_after_export_checkbox = tk.Checkbutton(file_frame, text="Open After Export")
+        self.open_after_export_checkbox.var = tk.BooleanVar(value=self.open_after_export)
+        self.open_after_export_checkbox.config(variable=self.open_after_export_checkbox.var)
+        self.open_after_export_checkbox.pack(side="left", padx=10)
+
 
         # Input fields
         self.input_frame = tk.Frame(self)
@@ -101,6 +108,11 @@ class PDFChopper(TkinterDnD.Tk):
         tk.Label(self.input_frame, text="Output base name:").grid(row=1, column=4, padx=5, sticky="e")
         self.output_base_name = tk.Entry(self.input_frame, width=20,state="disabled")
         self.output_base_name.grid(row=1, column=5, padx=5, sticky="w")
+
+        self.over_write_without_warning_checkbox = tk.Checkbutton(self.input_frame, text="Overwrite")
+        self.over_write_without_warning_checkbox.var = tk.BooleanVar(value=self.over_write_without_warning)
+        self.over_write_without_warning_checkbox.config(variable=self.over_write_without_warning_checkbox.var)
+        self.over_write_without_warning_checkbox.grid(row=1, column=7, padx=5, sticky="w")
 
         self.rows_frame = tk.Frame(self)
         self.rows_frame.pack(padx=10,pady=10)
@@ -417,6 +429,8 @@ class PDFChopper(TkinterDnD.Tk):
     def save_program_settings(self):
         data = {"x": self.winfo_x(), "y": self.winfo_y(),
                 "export_folder": self.default_export_folder,
+                "open_after_export": self.open_after_export_checkbox.var.get(),
+                "over_write_without_warning": self.over_write_without_warning_checkbox.var.get(),
                 "use_library": self.use_library_checkbox.var.get()}
         home = os.path.expanduser("~")
         path = os.path.join(HOME, PDFCHOPPER_CONFIG_FOLDER, "settings.json")
@@ -433,7 +447,12 @@ class PDFChopper(TkinterDnD.Tk):
                     x = data.get("x", 100)
                     y = data.get("y", 100)
                     self.default_export_folder=data.get("export_folder", "")
+                    if not os.path.exists(self.default_export_folder):
+                        homeFolder = os.path.expanduser("~")
+                        self.default_export_folder = homeFolder
                     self.use_library = data.get("use_library", True)
+                    self.open_after_export = data.get("open_after_export", True)
+                    self.over_write_without_warning = data.get("over_write_without_warning", False)
                     self.geometry(f"+{x}+{y}")
                 except Exception:
                     self.geometry("+100+100")
@@ -445,15 +464,17 @@ class PDFChopper(TkinterDnD.Tk):
         for i,row in enumerate(self.row_data):
             pages_str = self.row_data[i]['pages'].get().strip()
             if pages_str:
-                self.export_one_row(i)
+                self.export_one_row(i,False)
             else:
                 base_name = self.output_base_name.get().strip()
                 outname = self.row_data[i-1]['outname'].get().strip()
                 self.show_status(f"Exported all files. Finished with row {i}, {base_name}{outname}.pdf",fg="green", clickPath="exportall")
+                if self.open_after_export_checkbox.var.get():
+                    self.open_export_folder()
                 return
 
 
-    def export_one_row(self,row):
+    def export_one_row(self,row,open_folder=True):
         repeat_start = self.repeat_start.get().strip()
         repeat_end = self.repeat_end.get().strip()
 
@@ -471,6 +492,8 @@ class PDFChopper(TkinterDnD.Tk):
             return
 
         self.export_pages(base_name, outname+".pdf", repeat_start, pages_str, repeat_end, export_folder)
+        if open_folder and self.open_after_export_checkbox.var.get():
+            self.open_export_folder()
 
 
     def export_pages(self,base_name, outname, repeat_start,pages_str,repeat_end,export_folder):
@@ -497,7 +520,7 @@ class PDFChopper(TkinterDnD.Tk):
         # print(f"Input file: {input_file_with_path}")
         # print(f"Pages to export: {pages}")
         # print(f"Output file: {output_file_with_path}")  
-        PDFChopper.export_with_qpdf(input_file_with_path, pages, output_file_with_path)
+        PDFChopper.export_with_qpdf(input_file_with_path, pages, output_file_with_path,self.over_write_without_warning_checkbox.var.get())
         self.show_status(f"Exported Pages {result} to {export_folder}/{base_name}{outname}", fg="green", clickPath=output_file_with_path)
 
 
@@ -537,7 +560,7 @@ class PDFChopper(TkinterDnD.Tk):
 
 
     @staticmethod
-    def export_with_qpdf(input_file_with_path, pages, output_file_with_path):
+    def export_with_qpdf(input_file_with_path, pages, output_file_with_path,over_write_without_warning=False):
         """
         Export the specified pages from the input PDF file to the output PDF file using qpdf.
         """
@@ -545,7 +568,7 @@ class PDFChopper(TkinterDnD.Tk):
             raise FileNotFoundError(f"Input file does not exist: {input_file_with_path}")
         if not pages:
             raise ValueError("No pages specified for export.")
-        if os.path.exists(output_file_with_path):
+        if not over_write_without_warning and os.path.exists(output_file_with_path):
             messagebox.showerror("Error", f"Output file {output_file_with_path} already exists. Please choose a different export folder or delete the existing file.")
             raise FileExistsError(f"Output file already exists: {output_file_with_path}")
 
